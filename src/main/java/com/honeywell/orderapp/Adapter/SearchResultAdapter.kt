@@ -1,7 +1,6 @@
 package com.honeywell.orderapp.Adapter
 
 import android.app.Activity
-import android.graphics.BitmapFactory
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -17,47 +16,37 @@ class SearchResultAdapter(private val mActivity: Activity) : RecyclerView.Adapte
     }
     protected var items:ArrayList<ViewHolderItem> = ArrayList()
 
+    override fun getItemViewType(position: Int): Int {
+        return 1
+    }
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val viewType = getItemViewType(position)
         val item = holder as ViewHolderItem
-        val food = MyUitl.dbHelper.GetFood(position)
+        val food = MyUitl.dbHelper?.GetFood(position)
         //holderItemDouble.tv_position.setText("position=" + position);
-        item.foodNameView.text = food.foodname
-        item.priceView.text = food.price.toString()
-        item.countView.text = food.count.toString()
+        item.foodNameView.text = food?.foodname
+        item.priceView.text = food?.price.toString()
+        item.countView.text = food?.count.toString()
         item.addButton.setOnClickListener {
-            food.count++
-            MyUitl.addPrice(food.price)
+            food!!.count++
+            MyUitl.addPrice(food?.price)
+            item.countView.text = food!!.count.toString()
         }
         item.subButton.setOnClickListener {
-            if(food.count>0) {
-                food.count--
+            if(food!!.count>0) {
+                food!!.count--
                 MyUitl.addPrice(-food.price)
+                item.countView.text = food!!.count.toString()
             }
         }
-        when(food.type)
-        {
-            0->{
-                when(food.image)
-                {
-                    "food1"->item.imageView.setImageResource(R.drawable.food1)
-                    "food2"->item.imageView.setImageResource(R.drawable.food2)
-                    "food3"->item.imageView.setImageResource(R.drawable.food3)
-                    "food4"->item.imageView.setImageResource(R.drawable.food4)
-                    "food5"->item.imageView.setImageResource(R.drawable.food5)
-                    "food6"->item.imageView.setImageResource(R.drawable.food6)
-                    "food7"->item.imageView.setImageResource(R.drawable.food7)
-                }
-            }
-            1->{
-                item.imageView.setImageBitmap(BitmapFactory.decodeFile(food.image))
-            }
-        }
+        MyUitl!!.SetImage(food!!, item.imageView)
         items.add(item)
     }
 
     override fun getItemCount(): Int {
-        return MyUitl.dbHelper.Size()
+        val count = MyUitl.dbHelper!!.Size()
+        return count
     }
 
     class ViewHolderItem(itemView: View) : ViewHolder(itemView) {

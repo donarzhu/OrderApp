@@ -5,8 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.honeywell.orderapp.R;
-
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -59,12 +57,19 @@ public class OrderDao {
         }
         if(datas.size() == 0)
         {
-            add("芒果果冻", (float) 15.00,0,"food0");
-            add("曲奇饼干", (float) 10.00,0,"food1");
-            add("提拉米苏", (float) 20.00,0,"food2");
-            add("水果派", (float) 12.00,0,"food3");
-            add("蛋糕", (float) 18.00,0,"food4");
-            add("奶油卷", (float) 8.00,0,"food5");
+            try
+            {
+                add("芒果果冻", (float) 15.00,0,"food0");
+                add("曲奇饼干", (float) 10.00,0,"food1");
+                add("提拉米苏", (float) 20.00,0,"food2");
+                add("水果派", (float) 12.00,0,"food3");
+                add("蛋糕", (float) 18.00,0,"food4");
+                add("奶油卷", (float) 8.00,0,"food5");
+            }
+            catch (Exception ex)
+            {
+                System.out.println(ex.getMessage());
+            }
         }
     }
 
@@ -78,9 +83,10 @@ public class OrderDao {
         food.price = price;
         food.type = type;
         SQLiteDatabase db = helper.getWritableDatabase();
-        db.beginTransaction();
-        db.execSQL("insert into " + OrderDBHelper.TABLE_NAME + " (Id, foodName, foodPrice,imageType,imageFile) values (id, foodName, price, type,image)");
-        db.setTransactionSuccessful();
+        //db.beginTransaction();
+        String sql = "insert into " + OrderDBHelper.TABLE_NAME + " (Id, foodName, foodPrice,imageType,imageFile) values ('"+id+"','"+ foodName+"',"+ price+","+type+",'"+image+"')";
+        db.execSQL(sql);
+        //db.setTransactionSuccessful();
         datas.add(food);
     }
 
@@ -88,6 +94,13 @@ public class OrderDao {
     {
         SQLiteDatabase db = helper.getWritableDatabase();
         db.delete(OrderDBHelper.TABLE_NAME,"Id = ?",new String[]{id});
+        for (Food food:datas) {
+            if(food.id.equals(id))
+            {
+                datas.remove(food);
+                break;
+            }
+        }
     }
 
     public void update(Food food)
